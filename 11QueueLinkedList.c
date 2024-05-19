@@ -6,91 +6,81 @@ struct Node {
     struct Node *next;
 };
 
-struct Node *head = NULL;
+struct Queue {
+    struct Node *front;
+    struct Node *rear;
+};
 
-struct Node *createNode(int val) {
-    struct Node *node = (struct Node*)malloc(sizeof(struct Node));
-    if (node == NULL) {
+struct Queue *createQueue() {
+    struct Queue *q = (struct Queue*)malloc(sizeof(struct Queue));
+    if (q == NULL) {
         printf("Memory allocation failed\n");
         exit(1);
     }
-    node->data = val;
-    node->next = NULL;
-    return node;
+    q->front = NULL;
+    q->rear = NULL;
+    return q;
 }
 
-void Push(int val) {
-    struct Node *newNode = createNode(val);
-    newNode->next = head;
-    head = newNode;
-    printf("Element Pushed successfully!!!\n");
-}
-
-void Pop() {
-    if (head == NULL) {
-        printf("Stack Underflow\n");
+void enqueue(struct Queue *q, int data) {
+    struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->next = NULL;
+    if (q->rear == NULL) {
+        q->front = newNode;
+        q->rear = newNode;
     } else {
-        struct Node *temp = head;
-        head = head->next;
-        printf("Element %d Removed Successfully!!!\n", temp->data);
+        q->rear->next = newNode;
+        q->rear = newNode;
+    }
+    printf("%d enqueued\n", data);
+}
+
+void dequeue(struct Queue *q) {
+    if (q->front == NULL) {
+        printf("Queue is empty\n");
+    } else {
+        struct Node *temp = q->front;
+        int data = temp->data;
+        q->front = q->front->next;
         free(temp);
-    }
-}
-
-void Peek() {
-    if (head == NULL) {
-        printf("Stack Underflow!!!\n");
-    } else {
-        printf("%d is the topmost element\n", head->data);
-    }
-}
-
-void Show() {
-    if (head == NULL) {
-        printf("Stack Underflow!!!\n");
-    } else {
-        struct Node *temp = head;
-        printf("Stack Elements are: \n");
-        while (temp != NULL) {
-            printf("%d\n", temp->data);
-            temp = temp->next;
+        printf("%d dequeued\n", data);
+        if (q->front == NULL) {
+            q->rear = NULL;
         }
     }
 }
 
 int main() {
-    int choice, val;
+    struct Queue *q = createQueue();
+    int choice, data;
+
     while (1) {
-        system("cls");
-        printf("1. Push.\n");
-        printf("2. Pop.\n");
-        printf("3. Peek.\n");
-        printf("4. Show.\n");
-        printf("5. Exit.\n");
-        printf("\nEnter Choice: ");
+        printf("\n1. Enqueue\n");
+        printf("2. Dequeue\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
         scanf("%d", &choice);
 
         switch (choice) {
             case 1:
-                printf("Enter Element to push: ");
-                scanf("%d", &val);
-                Push(val);
+                printf("Enter data to enqueue: ");
+                scanf("%d", &data);
+                enqueue(q, data);
                 break;
             case 2:
-                Pop();
+                dequeue(q);
                 break;
             case 3:
-                Peek();
-                break;
-            case 4:
-                Show();
-                break;
-            case 5:
                 exit(0);
             default:
-                printf("Invalid Choice...\n");
+                printf("Invalid choice\n");
         }
-        system("pause"); // press any key to continue
     }
+
     return 0;
 }
